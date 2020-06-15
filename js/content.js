@@ -207,5 +207,5 @@ var Bionomia = (function($, window, document) {
 }(jQuery, window, document));
 
 $(function() {
-  BionomiaAttributor.init();
+  Bionomia.init();
 });
