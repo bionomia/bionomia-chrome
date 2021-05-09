@@ -89,8 +89,10 @@ var Bionomia = (function($, window, document) {
         if (this.vars.gbifIdentifier !== 0 && !$.isNumeric(this.vars.gbifIdentifier)) {
           checkExist = setInterval(function() {
             if ($('#tabsScrollable') && $('#tabsScrollable').length) {
-              self.makeDatasetHTML();
-              if (self.vars.people) {
+              if ($('.bn-dataset').length === 0) {
+                self.makeDatasetHTML();
+              }
+              if (self.vars.people || self.vars.people === 0) {
                 self.adjustDatasetCounter();
               }
               clearInterval(checkExist);
