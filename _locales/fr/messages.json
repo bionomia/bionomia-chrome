@@ -11,6 +11,9 @@
   "attributed_by" : {
     "message" : "Attribué par"
   },
+  "claimed_by" : {
+    "message" : "Réclamé par"
+  },
   "people" : {
     "message" : "Personnes"
   },
