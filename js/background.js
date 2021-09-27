@@ -20,7 +20,7 @@ var BionomiaBackground = (function($, window, document) {
               tab = tab[0];
               $.ajax({
                 type: "GET",
-                url: "https://bionomia.net/occurrence/" + request.params.gbifID + ".json",
+                url: "https://bionomia.net/occurrence/" + request.params.gbifID + ".jsonld",
                 dataType: "json"
               }).done(function(data) {
                 chrome.tabs.sendMessage(tab.id, { method : "bn_occurrence", params : { data: data } });
