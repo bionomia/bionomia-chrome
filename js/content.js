@@ -17,13 +17,15 @@ var Bionomia = (function($, window, document) {
     receiveMessages: function() {
       var self = this, checkExist;
 
-      chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+      chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         switch(request.method) {
+
           case 'bn_flush':
             self.flushAll();
             self.setGBIFidentifier(self.getGBIFidentifier());
             self.sendMessage();
           break;
+
           case 'bn_occurrence':
             $.each(request.params.data.recorded, function() {
               self.vars.recorded += "<p>";
@@ -46,6 +48,7 @@ var Bionomia = (function($, window, document) {
               }
             }, 125);
           break;
+
           case 'bn_dataset':
             if (request.params.data["message"] !== undefined && request.params.data.message === "error") {
               $('.bn-dataset').remove();
@@ -55,6 +58,7 @@ var Bionomia = (function($, window, document) {
               self.adjustDatasetCounter();
             }
           break;
+
         }
         sendResponse({});
         return true;
@@ -121,34 +125,14 @@ var Bionomia = (function($, window, document) {
       var response = "";
       response += data.name;
       if (data["sameAs"].includes("Q")) {
-        response += " <img src=\"" + chrome.extension.getURL("images/wikidata_16x16.png") + "\" width=\"16\" height=\"16\" alt=\"iD icon\" border=\"0\">";
+        response += " <img src=\"" + chrome.runtime.getURL("images/wikidata_16x16.png") + "\" width=\"16\" height=\"16\" alt=\"iD icon\" border=\"0\">";
       } else {
-        response += " <img src=\"" + chrome.extension.getURL("images/orcid_16x16.gif") + "\" width=\"16\" height=\"16\" alt=\"iD icon\" border=\"0\">";
+        response += " <img src=\"" + chrome.runtime.getURL("images/orcid_16x16.gif") + "\" width=\"16\" height=\"16\" alt=\"iD icon\" border=\"0\">";
       }
       response += " <a href=\"" + data["sameAs"] + "\">" + data["sameAs"] + "</a><br>";
       return response;
     },
 
-/*
-REMOVED making of attributor until semantics are properly handled
-    makeAttributor: function(data, owner) {
-      var response = "";
-      if (data["sameAs"] === owner) {
-        response += "<span style=\"font-size:x-small\">" + chrome.i18n.getMessage("claimed_by") + ": ";
-      } else {
-        response += "<span style=\"font-size:x-small\">" + chrome.i18n.getMessage("attributed_by") + ": ";
-      }
-      response += data.name;
-      if (data["sameAs"].includes("Q")) {
-        response += " <img src=\"" + chrome.extension.getURL("images/wikidata_16x16.png") + "\" width=\"12\" height=\"12\" alt=\"iD icon\" border=\"0\">";
-      } else {
-        response += " <img src=\"" + chrome.extension.getURL("images/orcid_16x16.gif") + "\" width=\"12\" height=\"12\" alt=\"iD icon\" border=\"0\">";
-      }
-      response += " <a href=\"" + data["sameAs"] + "\">" + data["sameAs"] + "</a>";
-      response += "</span>";
-      return response;
-    },
-*/
     makeCited: function(data) {
       var citation = data["description"] ? data["description"] : "";
       return "<p class=\"bionomia-citation\">" + citation + " <a href=\"" + data["@id"] + "\">" + data["@id"] + "</a></p>";
@@ -171,7 +155,7 @@ REMOVED making of attributor until semantics are properly handled
     },
 
     makeDatasetHTML: function() {
-      var html = "", throbber = chrome.extension.getURL("images/ajax-loader.gif");
+      var html = "", throbber = chrome.runtime.getURL("images/ajax-loader.gif");
       html = "<li class=\"tab tab-right ng-scope bn-dataset\">" +
                 "<span>" +
                   "<a href=\"https://bionomia.net/dataset/" + this.vars.gbifIdentifier + "\" class=\"gb-button--brand gb-button--bionomia\">" +
@@ -191,10 +175,10 @@ REMOVED making of attributor until semantics are properly handled
       if (self.vars.gbifIdentifier !== 0) {
         if ($.isNumeric(self.vars.gbifIdentifier)) {
           message = { gbifID : self.vars.gbifIdentifier };
-          chrome.extension.sendMessage({ method : "bn_gbifID", params : message });
+          chrome.runtime.sendMessage({ method : "bn_gbifID", params : message });
         } else if (self.vars.gbifIdentifier.match(uuid_pattern)){
           message = { gbifDatasetKey : self.vars.gbifIdentifier };
-          chrome.extension.sendMessage({ method : "bn_gbifDatasetKey", params : message });
+          chrome.runtime.sendMessage({ method : "bn_gbifDatasetKey", params : message });
         }
       }
     }

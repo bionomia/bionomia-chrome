@@ -1,81 +1,46 @@
-/*global chrome, Object, alert */
-var BionomiaBackground = (function($, window, document) {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  switch(request.method) {
 
-  "use strict";
-
-  var _private = {
-
-    vars: {
-      gbifID: 0
-    },
-
-    receiveMessages: function() {
-      var self = this;
-
-      chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-        switch(request.method) {
-
-          case 'bn_gbifID':
-            chrome.tabs.query({active : true, currentWindow : true}, function(tab) {
-              tab = tab[0];
-              $.ajax({
-                type: "GET",
-                url: "https://bionomia.net/occurrence/" + request.params.gbifID + ".jsonld",
-                dataType: "json"
-              }).done(function(data) {
-                chrome.tabs.sendMessage(tab.id, { method : "bn_occurrence", params : { data: data } });
-                sendResponse({});
-                return true;
-              })
-              .fail(function(data) {
-                chrome.tabs.sendMessage(tab.id, { method : "bn_occurrence", params : { data: { message: "error"} } });
-                sendResponse({});
-                return true;
-              });
-            });
-          break;
-
-          case 'bn_gbifDatasetKey':
-            chrome.tabs.query({active : true, currentWindow : true}, function(tab) {
-              tab = tab[0];
-              $.ajax({
-                type: "GET",
-                url: "https://bionomia.net/dataset/" + request.params.gbifDatasetKey + ".json",
-                dataType: "json"
-              }).done(function(data) {
-                chrome.tabs.sendMessage(tab.id, { method : "bn_dataset", params : { data: data } });
-                sendResponse({});
-                return true;
-              })
-              .fail(function(data) {
-                chrome.tabs.sendMessage(tab.id, { method : "bn_dataset", params : { data: { message: "error"} } });
-                sendResponse({});
-                return true;
-              });
-            });
-          break;
-
-          default:
-            sendResponse({});
-            return true;
-        }
-        return true;
+    case 'bn_gbifID':
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        fetch("https://bionomia.net/occurrence/" + request.params.gbifID + ".jsonld")
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            chrome.tabs.sendMessage(tabs[0].id, { method : "bn_occurrence", params : { data: data } });
+            sendResponse();
+          })
+          .catch((error) => {
+            chrome.tabs.sendMessage(tabs[0].id, { method : "bn_occurrence", params : { data: { message: "error"} } });
+            sendResponse();
+          });
       });
-    }
+    break;
 
-  };
+    case 'bn_gbifDatasetKey':
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        fetch("https://bionomia.net/dataset/" + request.params.gbifDatasetKey + ".json")
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            chrome.tabs.sendMessage(tabs[0].id, { method : "bn_dataset", params : { data: data } });
+            sendResponse();
+          })
+          .catch((error) => {
+            chrome.tabs.sendMessage(tabs[0].id, { method : "bn_dataset", params : { data: { message: "error"} } });
+            sendResponse();
+          });
+      });
+    break;
 
-  return {
-    init: function() {
-      _private.receiveMessages();
-    }
-  };
+    default:
+      sendResponse({});
+  }
+  return true;
+});
 
-}(jQuery, window, document));
-
-$(function() {
-  BionomiaBackground.init();
-  chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) {
-    chrome.tabs.sendMessage(details.tabId, { method : "bn_flush" });
-  });
+chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
+  chrome.tabs.sendMessage(details.tabId, { method : "bn_flush" });
 });
