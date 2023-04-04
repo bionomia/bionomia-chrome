@@ -3,7 +3,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     case 'bn_gbifID':
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        fetch("https://bionomia.net/occurrence/" + request.params.gbifID + ".jsonld")
+        fetch("https://api.bionomia.net/occurrence/" + request.params.gbifID + ".jsonld")
           .then((response) => {
             return response.json();
           })
@@ -20,7 +20,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     case 'bn_gbifDatasetKey':
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        fetch("https://bionomia.net/dataset/" + request.params.gbifDatasetKey + ".json")
+        fetch("https://api.bionomia.net/dataset/" + request.params.gbifDatasetKey + ".json")
           .then((response) => {
             return response.json();
           })
