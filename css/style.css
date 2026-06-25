@@ -1,4 +1,7 @@
-p.bionomia-citation{
+.bn-attribution {
+  margin-top:0.5em;
+}
+.bn-citation {
   text-indent: -2em;
   padding-left: 2em;
   text-align:left;
@@ -8,4 +11,8 @@ p.bionomia-citation{
 }
 .bn-badge a, .bn-badge a:hover, .bn-badge a:active {
   text-decoration:none;
+}
+.bn-logo {
+  margin-left:0.5em;
+  margin-right:0.5em;
 }

@@ -11,8 +11,7 @@ var Bionomia = (function($, window, document) {
       recorded: "",
       identified: "",
       cited: "",
-      people: "",
-      timeout: 125,
+      timeout: 125
     },
 
     setDefaults: function() {
@@ -50,12 +49,12 @@ var Bionomia = (function($, window, document) {
 
           case 'bn_occurrence':
             $.each(request.params.data.recorded, function() {
-              self.vars.recorded += "<p>";
+              self.vars.recorded += "<p class=\"g-flex g-items-center\">";
               self.vars.recorded += self.makeName(this);
               self.vars.recorded += "</p>";
             });
             $.each(request.params.data.identified, function() {
-              self.vars.identified += "<p>";
+              self.vars.identified += "<p class=\"g-flex g-items-center\">";
               self.vars.identified += self.makeName(this);
               self.vars.identified += "</p>";
             });
@@ -76,7 +75,6 @@ var Bionomia = (function($, window, document) {
       this.vars.recorded = "";
       this.vars.identified = "";
       this.vars.cited = "";
-      this.vars.people = "";
     },
 
     getGBIFidentifier: function() {
@@ -114,7 +112,7 @@ var Bionomia = (function($, window, document) {
                     "<img src=\"https://api.bionomia.net/dataset/" + this.vars.gbifIdentifier + "/badge.svg\" class=\"bn-badge\" alt=\"Bionomia dataset badge\" width=\"210\" height=\"20\">" +
                   "</a>" +
                 "</div>";
-      $("header").append(html);
+      $("article h1").next("div").append(html);
       if ($(".bn-badge").length > 0) {
         SVGInject($(".bn-badge")[0]);
       }
@@ -124,23 +122,23 @@ var Bionomia = (function($, window, document) {
       var response = "";
       response += data.name;
       if (data["sameAs"].includes("Q")) {
-        response += " <img src=\"" + chrome.runtime.getURL("images/wikidata_16x16.png") + "\" width=\"16\" height=\"16\" alt=\"iD icon\" border=\"0\">";
+        response += " <img src=\"" + chrome.runtime.getURL("images/wikidata_16x16.png") + "\" width=\"16\" height=\"16\" alt=\"iD icon\" border=\"0\" class=\"bn-logo\">";
       } else {
-        response += " <img src=\"" + chrome.runtime.getURL("images/orcid_16x16.gif") + "\" width=\"16\" height=\"16\" alt=\"iD icon\" border=\"0\">";
+        response += " <img src=\"" + chrome.runtime.getURL("images/orcid_16x16.gif") + "\" width=\"16\" height=\"16\" alt=\"iD icon\" border=\"0\" class=\"bn-logo\">";
       }
-      response += " <a href=\"" + data["sameAs"] + "\">" + data["sameAs"] + "</a><br>";
+      response += " <a href=\"" + data["sameAs"] + "\">" + data["sameAs"] + "</a>";
       return response;
     },
 
     makeCited: function(data) {
       var citation = data["description"] ? data["description"] : "";
-      return "<p class=\"bionomia-citation\">" + citation + " <a href=\"" + data["@id"] + "\">" + data["@id"] + "</a></p>";
+      return "<p class=\"bn-citation\">" + citation + " <a href=\"" + data["@id"] + "\">" + data["@id"] + "</a></p>";
     },
 
     createOccurrence: function() {
       var self = this, checkExist = "";
 
-      if ($.isNumeric(this.vars.gbifIdentifier)) {
+      if ($.isNumeric(this.vars.gbifIdentifier) && (this.vars.recorded || this.vars.identified || this.vars.cited)) {
         checkExist = setInterval(function() {
           if ($('.bn-attribution').length === 0) {
             self.makeOccurrenceHTML();
@@ -155,15 +153,15 @@ var Bionomia = (function($, window, document) {
       var title = "";
       if (this.vars.recorded) {
         title = chrome.i18n.getMessage("collected_by");
-        $("header").append("<div class=\"bn-attribution\"><h4>" + title + "</h4>" + this.vars.recorded + "</div>");
+        $("article h1").next("div").children().last().append("<div class=\"bn-attribution\"><h4 class=\"g-font-semibold\">" + title + "</h4>" + this.vars.recorded + "</div>");
       }
       if (this.vars.identified) {
         title = chrome.i18n.getMessage("identified_by");
-        $("header").append("<div class=\"bn-attribution\"><h4>" + title + "</h4>" + this.vars.identified + "</div>");
+        $("article h1").next("div").children().last().append("<div class=\"bn-attribution\"><h4 class=\"g-font-semibold\">" + title + "</h4>" + this.vars.identified + "</div>");
       }
       if (this.vars.cited) {
         title = chrome.i18n.getMessage("cited_by");
-        $("header").append("<div class=\"bn-attribution\"><h4>" + title + "</h4>" + this.vars.cited + "</div>");
+        $("article h1").next("div").children().last().append("<div class=\"bn-attribution\"><h4 class=\"g-font-semibold\">" + title + "</h4>" + this.vars.cited + "</div>");
       }
     },
 
